@@ -1,0 +1,21 @@
+{
+  "name": "grin-api",
+  "version": "1.0.0",
+  "description": "API used to register and authenticate users, in addition to giving information about their nearest places of interest and their favorites",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm test"
+  },
+  "keywords": [
+    "grin",
+    "hapi",
+    "node",
+    "cache",
+    "redis"
+  ],
+  "author": "Yoel Monzon",
+  "license": "ISC",
+  "dependencies": {
+    "hapi": "^17.8.1"
+  }
+}
