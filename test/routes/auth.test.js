@@ -3,19 +3,19 @@ const JWT = require('jsonwebtoken')
 const mongoose = require('mongoose')
 const redis = require('yalo-cache-redis')
 const config = require('../../config')
-const userFixtures = require('../fixtures/users')
-const User = require('../../models/user')
-const cache = require('../../plugins/cache')
-const dbConnector = require('../../plugins/db-connector')
 const auth = require('../../plugins/auth')
 const authRoutes = require('../../routes/auth')
+const dbConnector = require('../../plugins/db-connector')
+const cache = require('../../plugins/cache')
+const User = require('../../models/user')
+const userFixtures = require('../fixtures/users')
 
 let server = null
 
 const authSecret = config.get('/api/auth/secret')
 
 beforeAll(async (done) => {
-  server = await Hapi.Server()
+  server = Hapi.Server()
 
   const plugins = [
     {
