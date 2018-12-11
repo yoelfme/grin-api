@@ -12,7 +12,7 @@ module.exports = {
     const { host, port, partition } = options
 
     await redis.start({
-      debug: true,
+      debug: false,
       redis: {
         host,
         port,
