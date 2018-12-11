@@ -67,6 +67,40 @@ const config = {
         production: process.env.AUTH_SECRET,
       },
     },
+    google: {
+      maps: {
+        key: {
+          $filter: 'env',
+          test:
+            process.env.GOOGLE_MAPS_API_KEY
+            || 'AIzaSyD64RboJDQ72EFYls8tfPz7dd9XY7VhwZA',
+          staging: process.env.GOOGLE_MAPS_API_KEY,
+          production: process.env.GOOGLE_MAPS_API_KEY,
+        },
+        radius: process.env.GOOGLE_MAPS_SEARCH_RADIUS || 2000,
+      },
+    },
+    pagination: {
+      query: {
+        limit: {
+          default: 20,
+        },
+      },
+      meta: {
+        limit: {
+          active: false,
+        },
+        totalCount: {
+          active: false,
+        },
+        first: {
+          active: false,
+        },
+        last: {
+          active: false,
+        },
+      },
+    },
     env: process.env.APP_ENV,
   },
 }
