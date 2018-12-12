@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+  api:
+    build: .
+    command: node server.js
+    volumes:
+      - ./:/code
+    ports:
+      - 3000:3000
+    env_file: .env.docker
+    depends_on:
+      - redis
+      - mongo
+
+  redis:
+    restart: always
+    image: redis
+
+  mongo:
+    restart: always
+    image: mongo
