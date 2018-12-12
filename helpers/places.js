@@ -8,6 +8,41 @@ const { key: googleMapsKey, radius: searchRadius } = config.get(
 )
 const logger = bucker.createLogger({ name: '/helpers/places' })
 
+const getPlaceById = async (placeId) => {
+  try {
+    logger.info(`Finding a place with the id: ${placeId}`)
+
+    const query = {
+      placeid: placeId,
+      fields: ['name', 'rating', 'types', 'geometry', 'place_id'].join(','),
+      key: googleMapsKey,
+    }
+
+    const uri = 'https://maps.googleapis.com/maps/api/place/details/json'
+    const { result: place } = await rp.get(uri, {
+      qs: query,
+      json: true,
+    })
+
+    if (place) {
+      logger.info(`Place with the id: ${placeId} places has been found`)
+
+      return place
+    }
+
+    logger.info(`Place with the id: ${placeId} does not exists`)
+
+    return null
+  } catch (error) {
+    logger.error(
+      `There was an error trying to find the place with the id: ${placeId}`,
+    )
+    logger.error(error)
+
+    throw error
+  }
+}
+
 const getNearbyPlaces = async ({
   lat, lon, text, sortby, pagetoken,
 }) => {
@@ -59,50 +94,107 @@ const getNearbyPlaces = async ({
   }
 }
 
-const getAllNearbyPlaces = async (query, allPlaces = []) => {
-  const { nextPageToken, places } = await getNearbyPlaces(query)
+const getDistanceFromUser = (user, place) => geolib.getDistance(user, place)
 
-  // eslint-disable-next-line no-param-reassign
-  allPlaces = allPlaces.concat(places)
+const trasnformFromGoogleToUser = (place) => {
+  const {
+    geometry: {
+      location: { lat, lng },
+    },
+  } = place
+  const location = { latitude: lat, longitude: lng }
 
-  if (nextPageToken) {
-    return new Promise(resolve => setTimeout(resolve, 2000)).then(() => getAllNearbyPlaces(
-      { ...query, pagetoken: nextPageToken },
-      allPlaces,
-    ))
+  return {
+    rating: place.rating || 0,
+    place_id: place.place_id,
+    categories: place.types,
+    name: place.name,
+    location,
   }
-
-  return allPlaces
 }
 
-const sanitizePlaces = ({ lat: latitude, lon: longitude }, places) => {
+const transfromFromGoogleToDB = (place) => {
+  const {
+    geometry: {
+      location: { lat, lng },
+    },
+  } = place
+
+  return {
+    rating: place.rating || 0,
+    place_id: place.place_id,
+    categories: place.types,
+    name: place.name,
+    location: {
+      type: 'Point',
+      coordinates: [lng, lat],
+    },
+  }
+}
+
+const transfromFromDBToUser = (place) => {
+  const [pLon, pLat] = place.location.coordinates
+  const location = {
+    latitude: pLat,
+    longitude: pLon,
+  }
+
+  return {
+    rating: place.rating || 0,
+    place_id: place.place_id,
+    categories: place.categories,
+    name: place.name,
+    location,
+    added_at: place.createdAt,
+  }
+}
+
+const placesFromDBToUser = (places, { lat: latitude, lon: longitude }) => {
+  let startLocation = null
+
+  if (latitude && longitude) {
+    startLocation = {
+      latitude,
+      longitude,
+    }
+  }
+
+  return places.map((placeData) => {
+    const place = transfromFromDBToUser(placeData)
+
+    if (startLocation) {
+      return {
+        ...place,
+        distance: getDistanceFromUser(startLocation, place.location),
+      }
+    }
+
+    return place
+  })
+}
+
+const placesFromGoogleToUser = ({ lat: latitude, lon: longitude }, places) => {
   const startLocation = {
     latitude,
     longitude,
   }
 
-  return places.map((place) => {
-    const {
-      geometry: {
-        location: { lat, lng },
-      },
-    } = place
-    const placeLocation = { latitude: lat, longitude: lng }
-    const distance = geolib.getDistance(startLocation, placeLocation)
+  return places.map((placeData) => {
+    const place = trasnformFromGoogleToUser(placeData)
 
     return {
-      distance,
-      rating: place.rating || 0,
-      id: place.id,
-      category: place.types,
-      name: place.name,
-      location: placeLocation,
+      ...place,
+      distance: getDistanceFromUser(startLocation, place.location),
     }
   })
 }
 
 module.exports = {
+  getPlaceById,
   getNearbyPlaces,
-  getAllNearbyPlaces,
-  sanitizePlaces,
+  placesFromGoogleToUser,
+  placesFromDBToUser,
+  trasnformFromGoogleToUser,
+  transfromFromDBToUser,
+  transfromFromGoogleToDB,
 }
