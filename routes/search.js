@@ -23,10 +23,13 @@ module.exports = {
               .min(-180)
               .max(180)
               .required(),
-            sortby: Joi.string().allow(['popularity', 'distance']),
+            sortby: Joi.string().valid(['rating', 'distance']),
             page: Joi.number().min(1),
-            limit: Joi.number().allow([5, 10, 20]),
+            limit: Joi.number().allow([20]),
           },
+          headers: Joi.object({
+            authorization: Joi.string().required(),
+          }).options({ allowUnknown: true }),
         },
       },
       handler: search,

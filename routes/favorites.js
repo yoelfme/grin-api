@@ -16,6 +16,11 @@ module.exports = {
           params: {
             placeId: joi.string().required(),
           },
+          headers: joi
+            .object({
+              authorization: joi.string().required(),
+            })
+            .options({ allowUnknown: true }),
         },
       },
       handler: add,
@@ -34,6 +39,11 @@ module.exports = {
           params: {
             placeId: joi.string().required(),
           },
+          headers: joi
+            .object({
+              authorization: joi.string().required(),
+            })
+            .options({ allowUnknown: true }),
         },
       },
       handler: remove,
@@ -47,6 +57,7 @@ module.exports = {
         description: 'List all favorites places of the user',
         notes: `List all the places that the user has added to his favorite places,
           and also the user can sort by distance, rating or added date`,
+        tags: ['api', 'favorites'],
         validate: {
           query: {
             sortby: joi
@@ -60,6 +71,11 @@ module.exports = {
               .number()
               .when('sortby', { is: 'distance', then: joi.required() }),
           },
+          headers: joi
+            .object({
+              authorization: joi.string().required(),
+            })
+            .options({ allowUnknown: true }),
         },
       },
       handler: list,

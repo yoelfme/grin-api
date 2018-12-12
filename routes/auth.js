@@ -1,4 +1,4 @@
-const Joi = require('joi')
+const joi = require('joi')
 const { register, login, logout } = require('../handlers/auth')
 
 module.exports = {
@@ -13,18 +13,21 @@ module.exports = {
           'Create a new user but first validate if is unique and then returns a new JWT for the new user',
         tags: ['api', 'auth'],
         validate: {
-          payload: Joi.object().keys({
-            email: Joi.string()
+          payload: joi.object().keys({
+            email: joi
+              .string()
               .email()
               .required(),
-            username: Joi.string()
+            username: joi
+              .string()
               .alphanum()
               .min(3)
               .max(30)
               .required(),
-            password: Joi.string().regex(/^[a-zA-Z0-9]{3,30}$/),
-            passwordConfirm: Joi.any()
-              .only(Joi.ref('password'))
+            password: joi.string().regex(/^[a-zA-Z0-9]{3,30}$/),
+            passwordConfirm: joi
+              .any()
+              .only(joi.ref('password'))
               .required()
               .options({ language: { allowOnly: 'must match password' } }),
           }),
@@ -42,14 +45,19 @@ module.exports = {
         notes: 'Authenticate a user with his username or email',
         tags: ['api', 'auth'],
         validate: {
-          payload: Joi.object()
+          payload: joi
+            .object()
             .keys({
-              email: Joi.string().email(),
-              username: Joi.string()
+              email: joi.string().email(),
+              username: joi
+                .string()
                 .alphanum()
                 .min(3)
                 .max(30),
-              password: Joi.string().regex(/^[a-zA-Z0-9]{3,30}$/),
+              password: joi
+                .string()
+                .regex(/^[a-zA-Z0-9]{3,30}$/)
+                .required(),
             })
             .xor('email', 'username'),
           // This means that they don't have to appear together but where one of them is required
@@ -67,6 +75,13 @@ module.exports = {
         notes:
           'Logout a user means that we are going to invalidate his session',
         tags: ['api', 'auth'],
+        validate: {
+          headers: joi
+            .object({
+              authorization: joi.string().required(),
+            })
+            .options({ allowUnknown: true }),
+        },
       },
       handler: logout,
     })
