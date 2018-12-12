@@ -41,7 +41,6 @@
     "inert": "^5.1.2",
     "joi": "^14.3.0",
     "jsonwebtoken": "^8.4.0",
-    "lodash": "^4.17.11",
     "minimist": "^1.2.0",
     "mongoose": "^5.3.14",
     "request": "^2.88.0",
