@@ -29,6 +29,7 @@ const search = async (request, h) => {
   }
 
   try {
+    logger.info('Received a new request wit query: %j', query)
     const requestId = getRequestId({ ...query })
 
     // Validate if the user has already made a request with the same query

@@ -62,6 +62,11 @@ const login = async (request) => {
   try {
     logger.info('Finding information about user: %j', query)
     const user = await User.findOne(query)
+
+    if (!user) {
+      return boom.unauthorized()
+    }
+
     const match = await bcrypt.compare(data.password, user.hashedPassword)
 
     if (!match) {

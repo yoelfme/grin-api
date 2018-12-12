@@ -62,7 +62,7 @@ const getNearbyPlaces = async ({
 
     if (sortby) {
       delete query.radius
-      query.rankby = sortby
+      query.rankby = sortby === 'rating' ? 'prominence' : sortby
     }
   }
 

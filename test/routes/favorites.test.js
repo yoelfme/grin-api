@@ -62,6 +62,13 @@ afterEach(async (done) => {
   await Place.deleteMany({})
   await User.deleteMany({})
 
+  // eslint-disable-next-line no-unused-expressions
+  Place.findOne.restore && Place.findOne.restore()
+  // eslint-disable-next-line no-unused-expressions
+  Place.create.restore && Place.create.restore()
+  // eslint-disable-next-line no-unused-expressions
+  User.findOneAndUpdate.restore && User.findOneAndUpdate.restore()
+
   done()
 })
 
@@ -84,17 +91,17 @@ describe('add places', () => {
       },
     }
 
+    sinon.spy(Place, 'create')
     sinon.spy(Place, 'findOne')
+    sinon.spy(User, 'findOneAndUpdate')
 
     const { result, statusCode } = await server.inject(request)
 
     expect(statusCode).toBe(404)
     expect(result.error).toBe('Not Found')
-
-    Place.findOne.restore()
   })
 
-  test('should be abe able to create the place and add to the favorites in the user', async () => {
+  test('should be able to create the place and add to the favorites in the user', async () => {
     const placeId = 'ChIJ1RhNBET_0YURCdkz4j2Bqt0'
     const request = {
       method: 'POST',
@@ -121,10 +128,6 @@ describe('add places', () => {
     // create the place first, and then we are going to add it to the user favorite places
     expect(Place.create.calledOnce).toBe(true)
     expect(data).toEqual(expect.objectContaining({ placeId }))
-
-    Place.findOne.restore()
-    Place.create.restore()
-    User.findOneAndUpdate.restore()
   })
 
   test('should be able to find if the place already exists and just add to the user', async () => {
@@ -168,10 +171,6 @@ describe('add places', () => {
     expect(Place.findOne.calledOnce).toBe(true)
     expect(User.findOneAndUpdate.calledOnce).toBe(true)
     expect(data).toEqual(expect.objectContaining({ placeId }))
-
-    Place.findOne.restore()
-    Place.create.restore()
-    User.findOneAndUpdate.restore()
   })
 
   test('should be able to reject if the user already has added the place to his favorites', async () => {
@@ -207,10 +206,6 @@ describe('add places', () => {
     expect(Place.create.notCalled).toBe(true)
     expect(Place.findOne.calledOnce).toBe(true)
     expect(User.findOneAndUpdate.calledOnce).toBe(true)
-
-    Place.findOne.restore()
-    Place.create.restore()
-    User.findOneAndUpdate.restore()
   })
 })
 
@@ -246,14 +241,14 @@ describe('delete places', () => {
       },
     }
 
+    sinon.spy(Place, 'create')
+    sinon.spy(Place, 'findOne')
     sinon.spy(User, 'findOneAndUpdate')
 
     const { statusCode } = await server.inject(request)
 
     expect(statusCode).toBe(204)
     expect(User.findOneAndUpdate.calledOnce).toBe(true)
-
-    User.findOneAndUpdate.restore()
   })
 
   test('should be able to return a not found if the place does not exists in our places', async () => {
@@ -267,15 +262,15 @@ describe('delete places', () => {
       },
     }
 
+    sinon.spy(Place, 'create')
     sinon.spy(Place, 'findOne')
+    sinon.spy(User, 'findOneAndUpdate')
 
     const { result, statusCode } = await server.inject(request)
 
     expect(statusCode).toBe(404)
     expect(result.error).toBe('Not Found')
     expect(Place.findOne.calledOnce).toBe(true)
-
-    Place.findOne.restore()
   })
 
   test('should be able to return not found even if the place exists in our places, but not in the user favorites', async () => {
@@ -300,15 +295,15 @@ describe('delete places', () => {
       },
     }
 
+    sinon.spy(Place, 'create')
     sinon.spy(Place, 'findOne')
+    sinon.spy(User, 'findOneAndUpdate')
 
     const { result, statusCode } = await server.inject(request)
 
     expect(statusCode).toBe(404)
     expect(result.error).toBe('Not Found')
     expect(Place.findOne.calledOnce).toBe(true)
-
-    Place.findOne.restore()
   })
 })
 

@@ -38,6 +38,7 @@ jspm_packages
 
 # Environment file
 .env
+.env.docker
 
 # VS Code Settings
 .vscode/
