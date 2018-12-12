@@ -83,23 +83,10 @@ const config = {
     pagination: {
       query: {
         limit: {
-          default: 20,
+          default: 10,
         },
       },
-      meta: {
-        limit: {
-          active: false,
-        },
-        totalCount: {
-          active: false,
-        },
-        first: {
-          active: false,
-        },
-        last: {
-          active: false,
-        },
-      },
+      meta: {},
     },
     env: process.env.APP_ENV,
   },
