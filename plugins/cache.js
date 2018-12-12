@@ -4,7 +4,7 @@ const config = require('../config')
 
 const logger = bucker.createLogger({
   ...config.get('/logger/options'),
-  name: '/handlers/proxy',
+  name: '/plugins/cache',
 })
 
 module.exports = {
