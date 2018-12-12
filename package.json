@@ -4,7 +4,7 @@
   "description": "API used to register and authenticate users, in addition to giving information about their nearest places of interest and their favorites",
   "main": "index.js",
   "scripts": {
-    "test": "APP_ENV=test jest",
+    "test": "APP_ENV=test jest --runInBand",
     "precommit": "lint-staged"
   },
   "lint-staged": {
