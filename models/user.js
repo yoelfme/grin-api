@@ -4,9 +4,18 @@ const { Schema } = mongoose
 
 const userSchema = new Schema(
   {
-    email: String,
+    email: {
+      type: String,
+      unique: true,
+    },
     username: String,
     hashedPassword: String,
+    favorite_places: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Place',
+      },
+    ],
   },
   {
     timestamps: true,
