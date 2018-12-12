@@ -1,10 +1,15 @@
-const Confidence = require('confidence')
+const confidence = require('confidence')
+const Package = require('./package.json')
 
 const config = {
   $meta: 'This file defines all configuration for the API',
   projectName: 'api',
   server: {
     port: process.env.APP_PORT || 3000,
+  },
+  documentation: {
+    title: 'Grin API Documentation',
+    version: Package.version,
   },
   api: {
     db: {
@@ -17,7 +22,7 @@ const config = {
       },
       port: {
         $filter: 'env',
-        $default: '127.0.0.1',
+        $default: '27017',
         test: process.env.APP_DB_PORT || '27017',
         staging: process.env.APP_DB_PORT,
         production: process.env.APP_DB_PORT,
@@ -87,12 +92,20 @@ const config = {
         },
       },
       meta: {},
+      routes: {
+        exclude: [
+          '/',
+          '/swaggerui/{path*}',
+          '/swaggerui/extend.js',
+          '/swagger.json',
+        ],
+      },
     },
     env: process.env.APP_ENV,
   },
 }
 
-const store = new Confidence.Store(config)
+const store = new confidence.Store(config)
 
 module.exports = {
   get: (key, criteria = { env: process.env.APP_ENV }) => store.get(key, criteria),
