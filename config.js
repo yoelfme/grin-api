@@ -76,9 +76,7 @@ const config = {
       maps: {
         key: {
           $filter: 'env',
-          test:
-            process.env.GOOGLE_MAPS_API_KEY
-            || 'AIzaSyD64RboJDQ72EFYls8tfPz7dd9XY7VhwZA',
+          test: process.env.GOOGLE_MAPS_API_KEY,
           staging: process.env.GOOGLE_MAPS_API_KEY,
           production: process.env.GOOGLE_MAPS_API_KEY,
         },
