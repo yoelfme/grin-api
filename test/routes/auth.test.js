@@ -38,13 +38,20 @@ beforeAll(async (done) => {
   await server.start()
   await server.register(plugins)
 
-  await User.insertMany(userFixtures)
+  done()
+})
 
+beforeEach(async (done) => {
+  await User.insertMany(userFixtures)
+  done()
+})
+
+afterEach(async (done) => {
+  await User.deleteMany({})
   done()
 })
 
 afterAll(async (done) => {
-  await User.deleteMany({})
   redis.stop()
   server.stop()
 

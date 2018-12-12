@@ -122,7 +122,7 @@ const transfromFromGoogleToDB = (place) => {
 
   return {
     rating: place.rating || 0,
-    place_id: place.place_id,
+    placeId: place.place_id,
     categories: place.types,
     name: place.name,
     location: {
@@ -141,7 +141,7 @@ const transfromFromDBToUser = (place) => {
 
   return {
     rating: place.rating || 0,
-    place_id: place.place_id,
+    place_id: place.placeId,
     categories: place.categories,
     name: place.name,
     location,

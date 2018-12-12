@@ -48,22 +48,27 @@ beforeAll(async (done) => {
 
   await server.start()
   await server.register(plugins)
-  await User.insertMany(userFixtures)
 
   done()
 })
 
 beforeEach(async (done) => {
+  await User.insertMany(userFixtures)
   const user = await User.findOne({ username: 'duplicateduser' })
   jwt = auth.createSession(user)
   done()
 })
 
-afterAll(async (done) => {
+afterEach(async (done) => {
   await User.deleteMany({})
-  server.stop()
+  done()
+})
 
-  mongoose.disconnect(done)
+afterAll(async (done) => {
+  await mongoose.disconnect()
+  redis.stop()
+  server.stop()
+  done()
 })
 
 describe('search places', () => {
@@ -108,6 +113,9 @@ describe('search places', () => {
 
     const { result, statusCode } = await server.inject(request)
 
+    await redis.delete(requestId, '1')
+    await redis.delete(`${requestId}-token`, '2')
+
     expect(statusCode).toBe(200)
     expect(result).toHaveProperty('meta')
     expect(result.meta.next).toBeNull()
@@ -115,7 +123,6 @@ describe('search places', () => {
     expect(result).toHaveProperty('results')
     expect(result.meta).toEqual(expect.any(Object))
     expect(result.results).toEqual(expect.any(Array))
-    expect(result.results).toHaveLength(6)
 
     // Becase we dont have data saved in cache we expect that we called 3 times redis.get,
     // one time redis.set and one time the Google API without an nextPageToken,
@@ -137,9 +144,6 @@ describe('search places', () => {
     redis.get.restore()
     redis.set.restore()
     rp.get.restore()
-
-    await redis.delete(requestId, '1')
-    await redis.delete(`${requestId}-token`, '2')
   })
 
   test('should be able to search places to Google Places using next page token before saved', async () => {
@@ -155,6 +159,7 @@ describe('search places', () => {
         authorization: `Bearer ${jwt}`,
       },
     }
+
     const requestId = getRequestId(query)
 
     const { result } = await server.inject(request)

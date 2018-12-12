@@ -27,7 +27,7 @@ module.exports = {
       try {
         mongoose.connect(
           uri,
-          { useNewUrlParser: true },
+          { useCreateIndex: true, useNewUrlParser: true },
         )
         logger.info(`Successful connection to: ${uri}`)
       } catch (error) {

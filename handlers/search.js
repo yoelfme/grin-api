@@ -1,7 +1,10 @@
 const boom = require('boom')
 const bucker = require('bucker')
 const redis = require('yalo-cache-redis')
-const { getNearbyPlaces, sanitizePlaces } = require('../helpers/places')
+const {
+  getNearbyPlaces,
+  placesFromGoogleToUser,
+} = require('../helpers/places')
 const { getRequestId } = require('../helpers/utils')
 
 const logger = bucker.createLogger({ name: '/handlers/search' })
@@ -12,7 +15,7 @@ This handler has 3 steps, although eventually it does not necessarily have to fu
 The steps are:
   1) Validate if the user has already made a request with the same query
   2) Validate if the user is asking for the next page of results
-  3) Ask to Google API for places based on the query or the nextPageToken
+  3) Ask to Google Places API for places based on the query or the nextPageToken
 */
 const search = async (request, h) => {
   const {
@@ -50,7 +53,7 @@ const search = async (request, h) => {
 
     // Ask to Google API for places based on the query
     const { nextPageToken, places } = await getNearbyPlaces(query)
-    const results = sanitizePlaces({ lat, lon }, places)
+    const results = placesFromGoogleToUser({ lat, lon }, places)
 
     if (nextPageToken) {
       // if we receive a nextPageToken that means that Google has more records of our query, so

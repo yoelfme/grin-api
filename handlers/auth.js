@@ -27,7 +27,11 @@ const register = async (request, h) => {
     const hashedPassword = await bcrypt.hash(data.password, 10)
 
     logger.info('Creating new user with data: %j', data)
-    const user = await User.create({ ...data, hashedPassword })
+    const user = await User.create({
+      ...data,
+      hashedPassword,
+      favorite_places: [],
+    })
 
     logger.info(`User with email: ${user.email} has been created`)
 
